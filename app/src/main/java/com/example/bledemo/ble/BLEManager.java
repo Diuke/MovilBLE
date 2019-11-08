@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -111,16 +112,21 @@ public class BLEManager extends ScanCallback {
 
     }
 
-    public void enableBluetoothDevice(Activity activity,int REQUEST_ENABLE_BT){
-        try{
-            if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            }
-        }catch (Exception error){
-
-        }
+    public boolean isCharacteristicWriteable(BluetoothGattCharacteristic characteristic) {
+        return (characteristic.getProperties() &
+                (BluetoothGattCharacteristic.PROPERTY_WRITE
+                        | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) != 0;
     }
+
+    public boolean isCharacteristicReadable(BluetoothGattCharacteristic characteristic) {
+        return ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) != 0);
+    }
+
+    public boolean isCharacteristicNotifiable(BluetoothGattCharacteristic characteristic) {
+        return ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0);
+    }
+
+
 
 
 
@@ -192,6 +198,7 @@ public class BLEManager extends ScanCallback {
                                                     int status, int newState) {
                     super.onConnectionStateChange(gatt, status, newState);
                     if(newState==BluetoothGatt.STATE_CONNECTED){
+                        Toast.makeText(context, "Dispositivo Conectado", Toast.LENGTH_SHORT).show();
                         gatt.discoverServices();
                     }
                 }
@@ -241,7 +248,7 @@ public class BLEManager extends ScanCallback {
                 public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
                     super.onMtuChanged(gatt, mtu, status);
                 }
-            });
+            }, BluetoothDevice.TRANSPORT_LE);
         }catch (Exception error){
 
         }
