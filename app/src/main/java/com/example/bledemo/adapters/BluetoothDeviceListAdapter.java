@@ -15,18 +15,19 @@ import androidx.annotation.NonNull;
 
 import com.example.bledemo.MainActivity;
 import com.example.bledemo.R;
+import com.example.bledemo.ble.ScanModel;
 
 import java.util.List;
 
 
 
-public class BluetoothDeviceListAdapter extends ArrayAdapter<ScanResult> {
+public class BluetoothDeviceListAdapter extends ArrayAdapter<ScanModel> {
     private final Context context;
     private MainActivity mainActivity;
-    private List<ScanResult> scanResultList;
+    private List<ScanModel> scanResultList;
 
-    public BluetoothDeviceListAdapter(@NonNull Context context, List<ScanResult> scanResultList, MainActivity mainActivity) {
-        super(context, R.layout.device_list_item,scanResultList);
+    public BluetoothDeviceListAdapter(@NonNull Context context, List<ScanModel> scanResultList, MainActivity mainActivity) {
+        super(context, R.layout.device_list_item, scanResultList);
         this.context = context;
         this.mainActivity=mainActivity;
         this.scanResultList = scanResultList;
@@ -43,31 +44,31 @@ public class BluetoothDeviceListAdapter extends ArrayAdapter<ScanResult> {
         TextView txtName = (TextView) rowView.findViewById(R.id.ble_name);
         TextView txtSignal = (TextView) rowView.findViewById(R.id.signal_power);
 
-        String macAddress=scanResultList.get(position).getDevice().getAddress();
-        String deviceName=scanResultList.get(position).getDevice().getName();
-        String signal = ""+scanResultList.get(position).getRssi();
+        String macAddress=scanResultList.get(position).getMac();
+        String deviceName=scanResultList.get(position).getName();
+        String signal = ""+scanResultList.get(position).getSignal();
 
         txtMac.setText(macAddress);
         txtName.setText(deviceName);
         txtSignal.setText(signal);
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        /**rowView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                listView.getItemAtPosition(position);
+            public boolean onLongClick(View view) {
                 String address=((TextView) view.findViewById(R.id.ble_mac)).getText()+"";
                 Toast.makeText(context,"Connecting to: "+address,Toast.LENGTH_LONG).show();
                 mainActivity.bleManager.connectToGATTServer(mainActivity.bleManager.getByAddress(address));
                 return false;
             }
-        });
+        });**/
 
-        listView.setOnClickListener(new View.OnClickListener() {
+        rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String address=((TextView) view.findViewById(R.id.ble_mac)).getText()+"";
-                Toast.makeText(context,"Keep a long touch to connect...",Toast.LENGTH_LONG).show();
-                //mainActivity.bleManager.connectToGATTServer(mainActivity.bleManager.getByAddress(address));
+                Toast.makeText(mainActivity,"Connecting to: "+address,Toast.LENGTH_LONG).show();
+                //Toast.makeText(context,"Keep a long touch to connect...",Toast.LENGTH_LONG).show();
+                mainActivity.bleManager.connectToGATTServer(mainActivity.bleManager.getByAddress(address));
             }
         });
 
