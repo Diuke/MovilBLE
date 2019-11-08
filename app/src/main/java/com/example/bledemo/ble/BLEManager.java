@@ -224,6 +224,27 @@ public class BLEManager extends ScanCallback {
         return null;
     }
 
+    public boolean readCharacteristic(BluetoothGattCharacteristic characteristic){
+        try{
+            if(characteristic==null) return false;
+            return lastBluetoothGatt.readCharacteristic(characteristic);
+        }catch (Exception error){
+
+        }
+        return false;
+    }
+
+    public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic,byte[] data){
+        try{
+            if(characteristic==null) return false;
+            characteristic.setValue(data);
+            return lastBluetoothGatt.writeCharacteristic(characteristic);
+        }catch (Exception error){
+
+        }
+        return false;
+    }
+
 
     public void connectToGATTServer(BluetoothDevice device){
         try{
@@ -252,7 +273,7 @@ public class BLEManager extends ScanCallback {
                 @Override
                 public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                     super.onServicesDiscovered(gatt, status);
-                    bleModel = new BLEModel((ArrayList)gatt.getServices());
+                    bleModel = new BLEModel(gatt, (ArrayList)gatt.getServices());
                     searchAndSetAllNotifyAbleCharacteristics();
 
                 }
