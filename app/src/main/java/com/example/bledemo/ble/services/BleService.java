@@ -36,6 +36,7 @@ public class BleService extends IntentService implements BLEManagerCallerInterfa
     private int mConnectionState = STATE_DISCONNECTED;
 
     public BLEManager bleManager;
+    private BroadcastManager broadcastManager;
     private boolean isEnable = true;
 
     private ArrayList<String> requestQueue;
@@ -45,7 +46,8 @@ public class BleService extends IntentService implements BLEManagerCallerInterfa
 
     public BleService() {
         super("BleService");
-        bleManager = new BLEManager(this, getApplicationContext());
+        initializeBleManager();
+        initializeBroadcastManager();
         requestQueue = new ArrayList<>();
         requestExtras= new ArrayList<>();
     }
@@ -55,6 +57,15 @@ public class BleService extends IntentService implements BLEManagerCallerInterfa
         if(bleManager.getBluetoothManager() != null) {
             processQueue();
         }
+    }
+
+    private void initializeBleManager() {
+        bleManager = new BLEManager(this, getApplicationContext());
+    }
+
+    private void initializeBroadcastManager(){
+        broadcastManager = new BroadcastManager(this,
+                BroadcastManager.BROADCAST_CHANNEL,this);
     }
 
     private void waitForAWhile() {
@@ -108,14 +119,15 @@ public class BleService extends IntentService implements BLEManagerCallerInterfa
 
             case ACTION_READ_CHARACTERISTIC: {
                 String uuid = requestExtras.get(0);
-                //Read Characteristic
+                bleManager.readCharacteristic(bleManager.bleModel.getCharacteristicByUUID(uuid));
                 break;
             }
             case ACTION_WRITE_CHARACTERISTIC: {
                 String[] data = requestExtras.get(0).split("/");
                 String uuid = data[0];
-                String update = data[1];
-                //Write Characteristic
+                String updateData = data[1];
+                bleManager.writeCharacteristic(bleManager.bleModel.getCharacteristicByUUID(uuid),
+                        updateData.getBytes());
                 break;
             }
         }
@@ -141,6 +153,11 @@ public class BleService extends IntentService implements BLEManagerCallerInterfa
     @Override
     public void newDeviceDetected() {
 
+    }
+
+    @Override
+    public void sendBroadcastToGUI(String action, String data) {
+        //Send Broadcast to GUI
     }
 
     @Override

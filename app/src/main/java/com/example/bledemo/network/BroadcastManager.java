@@ -49,10 +49,10 @@ public class BroadcastManager extends BroadcastReceiver {
 
     public void sendBroadcast(String type, String message){
         try{
-            Intent intentToBeSent=new Intent();
+            Intent intentToBeSent = new Intent();
             intentToBeSent.setAction(channel);
-            intentToBeSent.putExtra("payload",message);
-            intentToBeSent.putExtra("type",type);
+            intentToBeSent.putExtra("payload", message);
+            intentToBeSent.putExtra("type", type);
             context.sendBroadcast(intentToBeSent);
         }catch (Exception error){
             caller.errorAtBroadcastManager(error);
