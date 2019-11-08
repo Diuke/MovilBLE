@@ -20,6 +20,9 @@
         <service
             android:name=".ble.BleService"
             android:exported="false"></service>
+        <service
+            android:name=".ble.services.BleService"
+            android:exported="false"></service>
 
         <activity
             android:name=".MainActivity"

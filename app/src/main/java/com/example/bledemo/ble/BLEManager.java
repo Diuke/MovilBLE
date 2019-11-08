@@ -45,7 +45,9 @@ public class BLEManager extends ScanCallback {
         initializeBluetoothManager();
     }
 
-
+    public BluetoothManager getBluetoothManager() {
+        return bluetoothManager;
+    }
 
     public void initializeBluetoothManager(){
         try{
@@ -65,7 +67,7 @@ public class BLEManager extends ScanCallback {
         return false;
     }
 
-    public void requestLocationPermissions(final Activity activity,int REQUEST_CODE){
+    public void requestLocationPermissions(final Activity activity,int REQUEST_CODE) {
         try{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -126,10 +128,6 @@ public class BLEManager extends ScanCallback {
         return ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0);
     }
 
-
-
-
-
     public void scanDevices(){
         try{
             scanResults.clear();
@@ -141,13 +139,22 @@ public class BLEManager extends ScanCallback {
         }
     }
 
+    public void stopScanDevices() {
+        try{
+            scanResults.clear();
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            bluetoothLeScanner.stopScan(this);
+        }catch (Exception error){
+
+        }
+    }
+
     @Override
     public void onScanResult(int callbackType, ScanResult result) {
         if(!isResultAlreadyAtList(result)) {
             scanResults.add(result);
         }
         caller.newDeviceDetected();
-
     }
 
     @Override
