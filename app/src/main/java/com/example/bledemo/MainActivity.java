@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
                     } else {
                         bleManager.scanDevices();
                     }
+                    changeBluetoothStatusTextView();
                 }
             }
         });
@@ -83,7 +84,17 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
         }else{
             bleManager.requestLocationPermissions(this,1002);
         }
+        changeBluetoothStatusTextView();
 
+    }
+
+    public void changeBluetoothStatusTextView(){
+        TextView status = (TextView)findViewById(R.id.adapter_status_textview);
+        if(bleManager.isBluetoothOn()) {
+            status.setText("Bluetooth Adapter: ON");
+        } else {
+            status.setText("Bluetooth Adapter: OFF");
+        }
     }
 
     @Override
