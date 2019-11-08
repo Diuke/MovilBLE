@@ -2,6 +2,8 @@ package com.example.bledemo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import com.example.bledemo.adapters.BluetoothDeviceListAdapter;
 import com.example.bledemo.ble.BLEManager;
 import com.example.bledemo.ble.BLEManagerCallerInterface;
+import com.example.bledemo.ble.UtilsBLE;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -22,11 +25,16 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements BLEManagerCallerInterface {
 
     public BLEManager bleManager;
     private MainActivity mainActivity;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,22 +43,47 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        boolean isSupported = UtilsBLE.CheckIfBLEIsSupportedOrNot(getApplicationContext());
+        TextView support = (TextView)findViewById(R.id.support_textview);
+        if(isSupported){
+            support.setText("Support BLE: TRUE");
+        } else {
+            support.setText("Support BLE: FALSE");
+        }
+
         FloatingActionButton fab = findViewById(R.id.fab);
+
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(bleManager!=null){
-                    bleManager.scanDevices();
+                    bleManager.scanResults.clear();
+                    notifyListViewChange();
+
+                    if(!bleManager.isBluetoothOn()) {
+                        if(UtilsBLE.RequestBluetoothDeviceEnable(mainActivity)){
+                            bleManager.scanDevices();
+                        }
+                    } else {
+                        bleManager.scanDevices();
+                    }
                 }
             }
         });
+        mainActivity=this;
         bleManager=new BLEManager(this,this);
+        bleManager.scanResults.clear();
+        ListView listView=(ListView)findViewById(R.id.devices_list_id);
+        BluetoothDeviceListAdapter adapter=new BluetoothDeviceListAdapter(getApplicationContext(),bleManager.scanResults,mainActivity);
+        listView.setAdapter(adapter);
+
         if(!bleManager.isBluetoothOn()){
-            bleManager.enableBluetoothDevice(this, 1001);
+            UtilsBLE.RequestBluetoothDeviceEnable(this);
         }else{
             bleManager.requestLocationPermissions(this,1002);
         }
-        mainActivity=this;
+
     }
 
     @Override
@@ -58,6 +91,12 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    public void notifyListViewChange(){
+        ListView listView=(ListView)findViewById(R.id.devices_list_id);
+        BluetoothDeviceListAdapter adapter = (BluetoothDeviceListAdapter)listView.getAdapter();
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -123,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
         }
     }
 
+
     @Override
     public void scanStartedSuccessfully() {
 
@@ -144,9 +184,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
             @Override
             public void run() {
                 try{
-                    ListView listView=(ListView)findViewById(R.id.devices_list_id);
-                    BluetoothDeviceListAdapter adapter=new BluetoothDeviceListAdapter(getApplicationContext(),bleManager.scanResults,mainActivity);
-                    listView.setAdapter(adapter);
+                    notifyListViewChange();
 
                 }catch (Exception error){
 
