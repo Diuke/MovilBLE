@@ -2,8 +2,6 @@ package com.example.bledemo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,23 +15,24 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements BLEManagerCallerInterface {
 
     public BLEManager bleManager;
     private MainActivity mainActivity;
+    private Switch btStatus;
+    private Snackbar snack;
 
 
     @Override
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
                     } else {
                         bleManager.scanDevices();
                     }
-                    changeBluetoothStatusTextView();
+                    changeBluetoothStatusSwitch();
                 }
             }
         });
@@ -84,16 +83,43 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
         }else{
             bleManager.requestLocationPermissions(this,1002);
         }
-        changeBluetoothStatusTextView();
+        changeBluetoothStatusSwitch();
+        btStatus = (Switch)findViewById(R.id.adapter_status_switch);
+        btStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b && !bleManager.isBluetoothOn()){
+                    UtilsBLE.RequestBluetoothDeviceEnable(getParent());
+                }else{
+                    UtilsBLE.RequestBluetoothDeviceDisable(getParent());
+                }
+            }
+        });
 
+        ListView devices = (ListView) findViewById(R.id.devices_list_id);
+        devices.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //Conexion con el dispositivo
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        snack = Snackbar.make(getCurrentFocus(), "Connecting",Snackbar.LENGTH_INDEFINITE);
+                        snack.show();
+                        //Intentar conectar
+                    }
+                });
+                //faltan estados de finalizacion del proceso en la SnackBar
+                return false;
+            }
+        });
     }
 
-    public void changeBluetoothStatusTextView(){
-        TextView status = (TextView)findViewById(R.id.adapter_status_textview);
+    public void changeBluetoothStatusSwitch(){
         if(bleManager.isBluetoothOn()) {
-            status.setText("Bluetooth Adapter: ON");
+            btStatus.setChecked(true);
         } else {
-            status.setText("Bluetooth Adapter: OFF");
+            btStatus.setChecked(false);
         }
     }
 
