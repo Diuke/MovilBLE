@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/ble_mac"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_weight="0.5"
+        android:clickable="false"
+        android:text="test"
+        android:textSize="20dp"
+
+        ></TextView>
+
+    <TextView
+        android:id="@+id/ble_name"
+        android:layout_width="254dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_weight="0.5"
+        android:clickable="false"
+        android:text="test"
+        android:textSize="20dp"
+
+        ></TextView>
+
+    <TextView
+        android:id="@+id/signal_power"
+        android:layout_width="176dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_weight="0.5"
+        android:clickable="false"
+        android:text="test"
+        android:textSize="20dp"
+
+        ></TextView>
+
+</LinearLayout>
