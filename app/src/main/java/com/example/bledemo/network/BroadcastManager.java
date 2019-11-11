@@ -4,6 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Parcelable;
+
+import com.example.bledemo.ble.ScanModel;
+
+import java.util.ArrayList;
 
 public class BroadcastManager extends BroadcastReceiver {
 
@@ -42,21 +47,44 @@ public class BroadcastManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String payload = intent.getExtras().getString("payload");
-        String type=intent.getExtras().getString("type");
-        caller.messageReceivedThroughBroadcastManager(this.channel, type, payload);
+        String action = intent.getExtras().getString("serviceAction");
+        String type = intent.getExtras().getString("type");
+        if(intent.hasExtra("message")) {
+            String payload = intent.getExtras().getString("message");
+            caller.messageReceivedThroughBroadcastManager(this.channel, action, type, payload);
+        }else if(intent.hasExtra("arrayData")) {
+            ArrayList<String> data = intent.getExtras().getStringArrayList("arrayData");
+            caller.messageReceivedThroughBroadcastManager(this.channel, action, type, data);
+        }
+
     }
 
-    public void sendBroadcast(String type, String message){
+    public void sendBroadcast(String action, String type, String message){
         try{
             Intent intentToBeSent = new Intent();
             intentToBeSent.setAction(channel);
-            intentToBeSent.putExtra("payload", message);
+            intentToBeSent.putExtra("serviceAction", action);
+            intentToBeSent.putExtra("message", message);
             intentToBeSent.putExtra("type", type);
             context.sendBroadcast(intentToBeSent);
         }catch (Exception error){
             caller.errorAtBroadcastManager(error);
         }
     }
+
+    public void sendArrayBroadcast(String action, String type, ArrayList<String> data){
+        try{
+            Intent intentToBeSent = new Intent();
+            intentToBeSent.setAction(channel);
+            intentToBeSent.putExtra("serviceAction", action);
+            intentToBeSent.putStringArrayListExtra("arrayData", data);
+            intentToBeSent.putExtra("type", type);
+            context.sendBroadcast(intentToBeSent);
+        }catch (Exception error){
+            caller.errorAtBroadcastManager(error);
+        }
+    }
+
+
 
 }

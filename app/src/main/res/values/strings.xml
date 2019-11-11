@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">BLEDemo</string>
     <string name="action_settings">Settings</string>
+    <string name="characteristic_write_failure">Error while writing the characteristic</string>
+    <string name="characteristic_write_success">Characteristic wrote successfully</string>
+    <string name="characteristic_read_failure">Error while reading the characteristic</string>
+    <string name="characteristic_read_success">Characteristic read successfully</string>
 </resources>
