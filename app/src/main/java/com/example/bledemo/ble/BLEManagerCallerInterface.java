@@ -1,10 +1,15 @@
 package com.example.bledemo.ble;
 
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+
 public interface BLEManagerCallerInterface {
 
     void scanStartedSuccessfully();
-    void scanStoped();
+    void scanStopped();
     void scanFailed(int error);
     void newDeviceDetected();
+    void characteristicOperation(BluetoothGatt gatt,
+                                 BluetoothGattCharacteristic characteristic, int status);
 
 }

@@ -2,8 +2,8 @@ package com.example.bledemo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,10 +14,8 @@ import com.example.bledemo.ble.BLEManager;
 import com.example.bledemo.ble.BLEManagerCallerInterface;
 import com.example.bledemo.ble.UtilsBLE;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -26,9 +24,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements BLEManagerCallerInterface {
 
@@ -63,10 +58,10 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
 
                     if(!bleManager.isBluetoothOn()) {
                         if(UtilsBLE.RequestBluetoothDeviceEnable(mainActivity)){
-                            bleManager.scanDevices();
+                            bleManager.startScanDevices();
                         }
                     } else {
-                        bleManager.scanDevices();
+                        bleManager.startScanDevices();
                     }
                     changeBluetoothStatusTextView();
                 }
@@ -180,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
     }
 
     @Override
-    public void scanStoped() {
+    public void scanStopped() {
 
     }
 
@@ -204,6 +199,11 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
             }
         });
 
+
+    }
+
+    @Override
+    public void characteristicOperation(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
 
     }
 }

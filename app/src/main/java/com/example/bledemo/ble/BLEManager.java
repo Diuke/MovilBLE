@@ -116,30 +116,23 @@ public class BLEManager extends ScanCallback {
 
     }
 
-    public boolean isCharacteristicWriteable(BluetoothGattCharacteristic characteristic) {
-        return (characteristic.getProperties() &
-                (BluetoothGattCharacteristic.PROPERTY_WRITE
-                        | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) != 0;
-    }
-
-    public boolean isCharacteristicReadable(BluetoothGattCharacteristic characteristic) {
-        return ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) != 0);
-    }
-
-    public boolean isCharacteristicNotifiable(BluetoothGattCharacteristic characteristic) {
-        return ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0);
-    }
-
-
-
-
-
-    public void scanDevices(){
+    public void startScanDevices(){
         try{
             scanResults.clear();
             bluetoothLeScanner=bluetoothAdapter.getBluetoothLeScanner();
             bluetoothLeScanner.startScan(this);
             caller.scanStartedSuccessfully();
+        }catch (Exception error){
+
+        }
+    }
+
+    public void stopScanDevices() {
+        try{
+            scanResults.clear();
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            bluetoothLeScanner.stopScan(this);
+            caller.scanStopped();
         }catch (Exception error){
 
         }
@@ -186,7 +179,7 @@ public class BLEManager extends ScanCallback {
                     if(currentService!=null){
                         for(BluetoothGattCharacteristic currentCharacteristic:currentService.getCharacteristics()){
                             if(currentCharacteristic!=null){
-                                if(isCharacteristicNotifiable(currentCharacteristic)){
+                                if(UtilsBLE.isCharacteristicNotifiable(currentCharacteristic)){
                                     lastBluetoothGatt.setCharacteristicNotification(currentCharacteristic, true);
                                     for(BluetoothGattDescriptor currentDescriptor:currentCharacteristic.getDescriptors()){
                                         if(currentDescriptor!=null){
@@ -321,6 +314,12 @@ public class BLEManager extends ScanCallback {
         }catch (Exception error){
 
         }
+    }
+
+    public void disconnectFromGATTServer() {
+        lastBluetoothGatt.close();
+        lastBluetoothGatt = null;
+        bleModel = null;
     }
 
 }
