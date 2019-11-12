@@ -203,7 +203,40 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
     }
 
     @Override
-    public void characteristicOperation(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+    public void characteristicOperation(String action, BluetoothGatt gatt,
+                                        BluetoothGattCharacteristic characteristic, int status) {
+        String msg = "";
+        switch (action) {
+            case BLEManager.ACTION_CHARACTERISTIC_CHANGE: {
+                //Log
+                msg +=  characteristic.getUuid().toString()+ "/" +
+                        characteristic.getStringValue(0);
+                break;
+            }
+            case BLEManager.ACTION_WRITE_CHARACTERISTIC: {
+                msg += characteristic.getUuid().toString() + "/" + status + "/";
+                if(status == BluetoothGatt.GATT_SUCCESS) {
+                    //Log Success
+                    msg += R.string.characteristic_write_success;
+                }else {
+                    //Log Failure
+                    msg += R.string.characteristic_write_failure;
+                }
+                break;
+            }
+            case BLEManager.ACTION_READ_CHARACTERISTIC: {
+                msg += characteristic.getUuid().toString()+ "/" + status + "/";
+                if(status == BluetoothGatt.GATT_SUCCESS) {
+                    //Log Success
+                    msg += (R.string.characteristic_read_success + "/" +
+                            characteristic.getStringValue(0));
+                }else {
+                    //Log Failure
+                    msg += R.string.characteristic_read_failure;
+                }
 
+                break;
+            }
+        }
     }
 }

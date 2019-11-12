@@ -9,7 +9,7 @@ public interface BLEManagerCallerInterface {
     void scanStopped();
     void scanFailed(int error);
     void newDeviceDetected();
-    void characteristicOperation(BluetoothGatt gatt,
+    void characteristicOperation(String action, BluetoothGatt gatt,
                                  BluetoothGattCharacteristic characteristic, int status);
 
 }

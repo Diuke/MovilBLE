@@ -43,6 +43,15 @@ public class BLEManager extends ScanCallback {
     public BluetoothGatt lastBluetoothGatt;
     public BLEModel bleModel;
 
+    public static final int NONE_STATUS = -30;
+
+    public static final String ACTION_READ_CHARACTERISTIC =
+            "com.example.bledemo.ble.ACTION_READ_CHARACTERISTIC";
+    public static final String ACTION_WRITE_CHARACTERISTIC =
+            "com.example.bledemo.ble.ACTION_WRITE_CHARACTERISTIC";
+    public static final String ACTION_CHARACTERISTIC_CHANGE =
+            "com.example.bledemo.ble.ACTION_CHARACTERISTIC_CHANGE";
+
     public BLEManager(BLEManagerCallerInterface caller, Context context) {
         this.caller = caller;
         this.context = context;
@@ -274,16 +283,19 @@ public class BLEManager extends ScanCallback {
                 @Override
                 public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                     super.onCharacteristicRead(gatt, characteristic, status);
+                    caller.characteristicOperation(ACTION_READ_CHARACTERISTIC, gatt, characteristic, status);
                 }
 
                 @Override
                 public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                     super.onCharacteristicWrite(gatt, characteristic, status);
+                    caller.characteristicOperation(ACTION_WRITE_CHARACTERISTIC, gatt, characteristic, status);
                 }
 
                 @Override
                 public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                     super.onCharacteristicChanged(gatt, characteristic);
+                    caller.characteristicOperation(ACTION_CHARACTERISTIC_CHANGE, gatt, characteristic, NONE_STATUS);
                 }
 
                 @Override
