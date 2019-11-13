@@ -100,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
         devices.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //Si ya está conectado pasa a ServicesInformation, sino intenta conectar
+                /* Intent intentServices = new Intent(getApplicationContext(),ServicesInformation.class);
+                startActivity(intentServices); */
                 //Conexion con el dispositivo
                 runOnUiThread(new Runnable() {
                     @Override
