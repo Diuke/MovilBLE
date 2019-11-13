@@ -255,6 +255,7 @@ public class BLEManager extends ScanCallback {
                     if(newState == BluetoothGatt.STATE_CONNECTED){
                         lastBluetoothGatt = gatt;
                         Toast.makeText(context, "Connected to device " + gatt.getDevice().getAddress(), Toast.LENGTH_SHORT).show();
+                        caller.gattConnected();
                         gatt.discoverServices();
                     }
                 }

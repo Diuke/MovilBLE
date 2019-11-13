@@ -14,6 +14,7 @@ public interface BLEManagerCallerInterface {
     void characteristicOperation(String action, BluetoothGatt gatt,
                                  BluetoothGattCharacteristic characteristic, int status);
     void arrayOperation(String action, ArrayList<String> data);
+    void gattConnected();
     void gattDisconnected();
 
 }
