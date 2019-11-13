@@ -35,4 +35,10 @@ public class ScanModel {
     public void setSignal(int signal) {
         this.signal = signal;
     }
+
+    @Override
+    public String toString() {
+        return name + "/" + mac + "/" + signal;
+    }
+
 }
