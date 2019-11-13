@@ -95,4 +95,19 @@ public class UtilsBLE {
         return ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0);
     }
 
+    public static byte[] hexStringToByteArray(String s) {
+        if((s.length() % 2) == 1){
+            s = "0" + s;
+        }
+        int len = s.length();
+        if(len == 1) {
+            return new byte[]{Byte.parseByte(s,16)};
+        }
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
+
 }

@@ -12,6 +12,7 @@ import com.example.bledemo.R;
 import com.example.bledemo.ble.BLEManager;
 import com.example.bledemo.ble.BLEManagerCallerInterface;
 import com.example.bledemo.ble.ScanModel;
+import com.example.bledemo.ble.UtilsBLE;
 import com.example.bledemo.network.BroadcastManager;
 import com.example.bledemo.network.BroadcastManagerCallerInterface;
 
@@ -148,7 +149,7 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
                 String uuid = data[0];
                 String updateData = data[1];
                 bleManager.writeCharacteristic(bleManager.bleModel.getCharacteristicByUUID(uuid),
-                        updateData.getBytes());
+                        UtilsBLE.hexStringToByteArray(updateData));
                 break;
             }
             case ACTION_GET_CHARACTERISTICS: {
