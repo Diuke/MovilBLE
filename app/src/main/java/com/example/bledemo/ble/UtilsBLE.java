@@ -55,6 +55,32 @@ public class UtilsBLE {
         return false;
     }
 
+    public static boolean RequestBluetoothDeviceDisable(final Activity activity){
+        try{
+            final BluetoothManager bluetoothManager=(BluetoothManager) activity.getSystemService(activity.BLUETOOTH_SERVICE);
+            BluetoothAdapter bluetoothAdapter=bluetoothManager.getAdapter();
+            if (bluetoothAdapter == null || bluetoothAdapter.isEnabled()) {
+                AlertDialog.Builder builder=new AlertDialog.Builder(activity)
+                        .setTitle("Bluetooth")
+                        .setMessage("The bluetooth is required in order for the application to work, please turn it on")
+                        .setIcon(R.mipmap.bt_blue)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                BluetoothAdapter.getDefaultAdapter().disable();
+                            }
+                        });
+                builder.show();
+
+            }else {
+                return true;
+            }
+        }catch (Exception error){
+
+        }
+        return false;
+    }
+
     public static boolean isCharacteristicWritable(BluetoothGattCharacteristic characteristic) {
         return (characteristic.getProperties() &
                 (BluetoothGattCharacteristic.PROPERTY_WRITE
