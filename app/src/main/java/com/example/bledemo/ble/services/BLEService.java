@@ -1,5 +1,6 @@
 package com.example.bledemo.ble.services;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 public class BLEService extends IntentService implements BLEManagerCallerInterface, BroadcastManagerCallerInterface {
 
     private final static String TAG = BLEService.class.getSimpleName();
+
+    public static boolean isRunning = false;
 
     public static final String ACTION_START_SCAN =
             "com.example.bledemo.ble.services.ACTION_START_SCAN";
@@ -43,13 +46,13 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
 
     public static final int NONE_STATUS = -30;
 
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
+    public static final int STATE_DISCONNECTED = 0;
+    public static final int STATE_CONNECTING = 1;
+    public static final int STATE_CONNECTED = 2;
 
-    private int mConnectionState = STATE_DISCONNECTED;
+    public static int mConnectionState = STATE_DISCONNECTED;
 
-    public BLEManager bleManager;
+    public static BLEManager bleManager;
     private BroadcastManager broadcastManager;
     private boolean isEnable = true;
 
@@ -124,8 +127,10 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
                 break;
             }
             case ACTION_GATT_CONNECT: {
+                mConnectionState = STATE_CONNECTING;
                 String address = extras;
                 bleManager.connectToGATTServer(bleManager.getByAddress(address));
+                mConnectionState = STATE_CONNECTED;
                 break;
             }
             case ACTION_GATT_DISCONNECT: {
@@ -226,6 +231,7 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
 
     @Override
     public void gattDisconnected() {
+        mConnectionState = STATE_DISCONNECTED;
         broadcastManager.sendBroadcast(ACTION_GATT_DISCONNECT,
                 BroadcastManager.SERVICE_TO_GUI_MESSAGE, "Disconnected");
     }
@@ -253,5 +259,21 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
     @Override
     public void errorAtBroadcastManager(Exception ex) {
         ex.printStackTrace();
+    }
+
+    public static boolean isBluetoothOn(){
+        return bleManager.isBluetoothOn();
+    }
+
+    public static void requestLocationPermissions(final Activity activity, int REQUEST_CODE){
+        bleManager.requestLocationPermissions(activity, REQUEST_CODE);
+    }
+
+    public static String getConnectedDeviceUUID(){
+        BluetoothGatt btGatt = bleManager.lastBluetoothGatt;
+        if (btGatt != null) {
+            return bleManager.lastBluetoothGatt.getDevice().getAddress();
+        }
+        return null;
     }
 }

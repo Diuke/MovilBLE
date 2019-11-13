@@ -62,7 +62,7 @@ public class BluetoothDeviceListAdapter extends ArrayAdapter<ScanModel> {
             }
         });**/
 
-        rowView.setOnClickListener(new View.OnClickListener() {
+        /*rowView.setOnLongClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String address=((TextView) view.findViewById(R.id.ble_mac)).getText()+"";
@@ -70,7 +70,7 @@ public class BluetoothDeviceListAdapter extends ArrayAdapter<ScanModel> {
                 //Toast.makeText(context,"Keep a long touch to connect...",Toast.LENGTH_LONG).show();
                 mainActivity.bleManager.connectToGATTServer(mainActivity.bleManager.getByAddress(address));
             }
-        });
+        });*/
 
 
         return rowView;

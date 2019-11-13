@@ -33,7 +33,7 @@ public class BLEManager extends ScanCallback {
     BLEManagerCallerInterface caller;
     Context context;
 
-    BluetoothManager bluetoothManager;
+    static BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner bluetoothLeScanner;
     public List<ScanModel> scanResults = new ArrayList<>();
