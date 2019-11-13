@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
                 if (b && !bleManager.isBluetoothOn()){
                     UtilsBLE.RequestBluetoothDeviceEnable(getParent());
                 }else{
-                    UtilsBLE.RequestBluetoothDeviceEnable(getParent());
+                    UtilsBLE.RequestBluetoothDeviceDisable(getParent());
                 }
             }
         });
