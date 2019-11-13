@@ -319,9 +319,13 @@ public class BLEManager extends ScanCallback {
     }
 
     public void disconnectFromGATTServer() {
-        lastBluetoothGatt.close();
-        lastBluetoothGatt = null;
-        bleModel = null;
+        try {
+            lastBluetoothGatt.disconnect();
+            lastBluetoothGatt = null;
+            bleModel = null;
+        }catch(Exception ex) {
+
+        }
     }
 
 }
