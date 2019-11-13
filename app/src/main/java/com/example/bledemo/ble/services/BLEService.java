@@ -130,7 +130,6 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
                 mConnectionState = STATE_CONNECTING;
                 String address = extras;
                 bleManager.connectToGATTServer(bleManager.getByAddress(address));
-                mConnectionState = STATE_CONNECTED;
                 break;
             }
             case ACTION_GATT_DISCONNECT: {
@@ -156,6 +155,11 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
                 String serviceUuid = extras;
                 arrayOperation(ACTION_GET_CHARACTERISTICS,
                         bleManager.bleModel.getCharacteristicProperties(serviceUuid));
+                break;
+            }
+
+            case ACTION_GET_SERVICES: {
+                arrayOperation(ACTION_GET_SERVICES, bleManager.bleModel.getServicesUuid());
                 break;
             }
         }
@@ -227,6 +231,13 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
     @Override
     public void arrayOperation(String action, ArrayList<String> data) {
         broadcastManager.sendArrayBroadcast(action, BroadcastManager.SERVICE_TO_GUI_MESSAGE, data);
+    }
+
+    @Override
+    public void gattConnected() {
+        mConnectionState = STATE_CONNECTED;
+        broadcastManager.sendBroadcast(ACTION_GATT_CONNECT,
+                BroadcastManager.SERVICE_TO_GUI_MESSAGE, "Connected");
     }
 
     @Override
