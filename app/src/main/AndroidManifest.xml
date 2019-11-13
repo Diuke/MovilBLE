@@ -21,8 +21,8 @@
         <activity android:name=".ServicesInformation" />
 
         <service
-            android:name=".ble.BleService"
-            android:exported="false" />
+            android:name=".ble.services.BLEService"
+            android:exported="false"></service>
 
         <activity android:name=".Log" />
         <activity

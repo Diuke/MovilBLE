@@ -13,7 +13,6 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,9 +23,8 @@ import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
-import com.example.bledemo.R;
+import com.example.bledemo.ble.services.BLEService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,18 +47,20 @@ public class BLEManager extends ScanCallback {
         initializeBluetoothManager();
     }
 
-
+    public BluetoothManager getBluetoothManager() {
+        return bluetoothManager;
+    }
 
     public void initializeBluetoothManager(){
         try{
-            bluetoothManager=(BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-            this.bluetoothAdapter=bluetoothManager.getAdapter();
+            bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+            this.bluetoothAdapter = bluetoothManager.getAdapter();
         }catch (Exception error){
 
         }
     }
 
-    public boolean isBluetoothOn(){
+    public boolean isBluetoothOn() {
         try{
             return bluetoothManager.getAdapter().isEnabled();
         }catch (Exception error){
@@ -69,7 +69,7 @@ public class BLEManager extends ScanCallback {
         return false;
     }
 
-    public void requestLocationPermissions(final Activity activity,int REQUEST_CODE){
+    public void requestLocationPermissions(final Activity activity,int REQUEST_CODE) {
         try{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -116,30 +116,23 @@ public class BLEManager extends ScanCallback {
 
     }
 
-    public boolean isCharacteristicWriteable(BluetoothGattCharacteristic characteristic) {
-        return (characteristic.getProperties() &
-                (BluetoothGattCharacteristic.PROPERTY_WRITE
-                        | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) != 0;
-    }
-
-    public boolean isCharacteristicReadable(BluetoothGattCharacteristic characteristic) {
-        return ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) != 0);
-    }
-
-    public boolean isCharacteristicNotifiable(BluetoothGattCharacteristic characteristic) {
-        return ((characteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0);
-    }
-
-
-
-
-
-    public void scanDevices(){
-        try{
+    public void startScanDevices(){
+        try {
             scanResults.clear();
-            bluetoothLeScanner=bluetoothAdapter.getBluetoothLeScanner();
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
             bluetoothLeScanner.startScan(this);
             caller.scanStartedSuccessfully();
+        }catch (Exception error){
+
+        }
+    }
+
+    public void stopScanDevices() {
+        try{
+            scanResults.clear();
+            bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            bluetoothLeScanner.stopScan(this);
+            caller.scanStopped();
         }catch (Exception error){
 
         }
@@ -149,13 +142,14 @@ public class BLEManager extends ScanCallback {
     public void onScanResult(int callbackType, ScanResult result) {
         ScanModel atList = isResultAlreadyAtList(result);
         if(atList == null) {
-            scanResults.add(new ScanModel(result.getDevice().getName(), result.getDevice().getAddress(), result.getRssi()));
+            ScanModel newDevice = new ScanModel(result.getDevice().getName(), result.getDevice().getAddress(), result.getRssi());
+            scanResults.add(newDevice);
             deviceList.add(result);
+            caller.newDeviceDetected(newDevice);
         } else {
             atList.setSignal(result.getRssi());
+            caller.newDeviceDetected(atList);
         }
-        caller.newDeviceDetected();
-
     }
 
     @Override
@@ -177,37 +171,33 @@ public class BLEManager extends ScanCallback {
         return null;
     }
 
-
     private void searchAndSetAllNotifyAbleCharacteristics() {
         try {
-
-            if(lastBluetoothGatt!=null){
-                for(BluetoothGattService currentService: lastBluetoothGatt.getServices()){
-                    if(currentService!=null){
-                        for(BluetoothGattCharacteristic currentCharacteristic:currentService.getCharacteristics()){
-                            if(currentCharacteristic!=null){
-                                if(isCharacteristicNotifiable(currentCharacteristic)){
+            if(lastBluetoothGatt != null) {
+                for(BluetoothGattService currentService: lastBluetoothGatt.getServices()) {
+                    if(currentService != null) {
+                        for(BluetoothGattCharacteristic currentCharacteristic:currentService.getCharacteristics()) {
+                            if(currentCharacteristic != null) {
+                                if(UtilsBLE.isCharacteristicNotifiable(currentCharacteristic)) {
                                     lastBluetoothGatt.setCharacteristicNotification(currentCharacteristic, true);
-                                    for(BluetoothGattDescriptor currentDescriptor:currentCharacteristic.getDescriptors()){
-                                        if(currentDescriptor!=null){
+                                    for(BluetoothGattDescriptor currentDescriptor:currentCharacteristic.getDescriptors()) {
+                                        if(currentDescriptor != null) {
                                             try {
                                                 currentDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                                                 lastBluetoothGatt.writeDescriptor(currentDescriptor);
-                                                bleModel.addSuscription(currentCharacteristic);
-
-                                            }catch (Exception internalError){
+                                            }catch (Exception internalError) {
 
                                             }
                                         }
                                     }
-
+                                    bleModel.addSuscription(currentCharacteristic);
                                 }
                             }
                         }
                     }
                 }
             }
-        } catch (Exception error){
+        } catch (Exception error) {
 
         }
 
@@ -245,8 +235,7 @@ public class BLEManager extends ScanCallback {
         return false;
     }
 
-
-    public void connectToGATTServer(BluetoothDevice device){
+    public void connectToGATTServer(BluetoothDevice device) {
         try{
             device.connectGatt(this.context, false, new BluetoothGattCallback() {
                 @Override
@@ -263,7 +252,7 @@ public class BLEManager extends ScanCallback {
                 public void onConnectionStateChange(BluetoothGatt gatt,
                                                     int status, int newState) {
                     super.onConnectionStateChange(gatt, status, newState);
-                    if(newState==BluetoothGatt.STATE_CONNECTED){
+                    if(newState == BluetoothGatt.STATE_CONNECTED){
                         lastBluetoothGatt = gatt;
                         Toast.makeText(context, "Connected to device " + gatt.getDevice().getAddress(), Toast.LENGTH_SHORT).show();
                         gatt.discoverServices();
@@ -273,24 +262,30 @@ public class BLEManager extends ScanCallback {
                 @Override
                 public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                     super.onServicesDiscovered(gatt, status);
-                    bleModel = new BLEModel(gatt, (ArrayList)gatt.getServices());
+                    bleModel = new BLEModel(gatt, (ArrayList) gatt.getServices());
+                    caller.arrayOperation(BLEService.ACTION_GET_SERVICES, bleModel.getServicesUuid());
                     searchAndSetAllNotifyAbleCharacteristics();
-
                 }
 
                 @Override
                 public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                     super.onCharacteristicRead(gatt, characteristic, status);
+                    caller.characteristicOperation(BLEService.ACTION_READ_CHARACTERISTIC, gatt,
+                            characteristic, status);
                 }
 
                 @Override
                 public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                     super.onCharacteristicWrite(gatt, characteristic, status);
+                    caller.characteristicOperation(BLEService.ACTION_WRITE_CHARACTERISTIC, gatt,
+                            characteristic, status);
                 }
 
                 @Override
                 public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                     super.onCharacteristicChanged(gatt, characteristic);
+                    caller.characteristicOperation(BLEService.ACTION_CHARACTERISTIC_CHANGE, gatt,
+                            characteristic, BLEService.NONE_STATUS);
                 }
 
                 @Override
@@ -319,6 +314,16 @@ public class BLEManager extends ScanCallback {
                 }
             }, BluetoothDevice.TRANSPORT_LE);
         }catch (Exception error){
+
+        }
+    }
+
+    public void disconnectFromGATTServer() {
+        try {
+            lastBluetoothGatt.disconnect();
+            lastBluetoothGatt = null;
+            bleModel = null;
+        }catch(Exception ex) {
 
         }
     }

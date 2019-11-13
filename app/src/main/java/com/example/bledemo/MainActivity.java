@@ -2,6 +2,8 @@ package com.example.bledemo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import com.example.bledemo.adapters.BluetoothDeviceListAdapter;
 import com.example.bledemo.ble.BLEManager;
 import com.example.bledemo.ble.BLEManagerCallerInterface;
+import com.example.bledemo.ble.ScanModel;
 import com.example.bledemo.ble.UtilsBLE;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -26,6 +29,8 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements BLEManagerCallerInterface {
 
@@ -62,10 +67,10 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
 
                     if(!bleManager.isBluetoothOn()) {
                         if(UtilsBLE.RequestBluetoothDeviceEnable(mainActivity)){
-                            bleManager.scanDevices();
+                            bleManager.startScanDevices();
                         }
                     } else {
-                        bleManager.scanDevices();
+                        bleManager.startScanDevices();
                     }
                     changeBluetoothStatusSwitch();
                 }
@@ -210,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
     }
 
     @Override
-    public void scanStoped() {
+    public void scanStopped() {
 
     }
 
@@ -220,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
     }
 
     @Override
-    public void newDeviceDetected() {
+    public void newDeviceDetected(ScanModel scanModel) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -234,6 +239,17 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
             }
         });
 
+
+    }
+
+    @Override
+    public void characteristicOperation(String action, BluetoothGatt gatt,
+                                        BluetoothGattCharacteristic characteristic, int status) {
+
+    }
+
+    @Override
+    public void arrayOperation(String action, ArrayList<String> data) {
 
     }
 }
