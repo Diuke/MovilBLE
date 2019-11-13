@@ -225,6 +225,12 @@ public class BLEService extends IntentService implements BLEManagerCallerInterfa
     }
 
     @Override
+    public void gattDisconnected() {
+        broadcastManager.sendBroadcast(ACTION_GATT_DISCONNECT,
+                BroadcastManager.SERVICE_TO_GUI_MESSAGE, "Disconnected");
+    }
+
+    @Override
     public void messageReceivedThroughBroadcastManager(String channel, String action, String type, String message) {
         try {
             if(channel.equals(BroadcastManager.BROADCAST_CHANNEL)) {

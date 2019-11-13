@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
                 if (b && !bleManager.isBluetoothOn()){
                     UtilsBLE.RequestBluetoothDeviceEnable(getParent());
                 }else{
-                    UtilsBLE.RequestBluetoothDeviceDisable(getParent());
+                    UtilsBLE.RequestBluetoothDeviceEnable(getParent());
                 }
             }
         });
@@ -250,6 +250,11 @@ public class MainActivity extends AppCompatActivity implements BLEManagerCallerI
 
     @Override
     public void arrayOperation(String action, ArrayList<String> data) {
+
+    }
+
+    @Override
+    public void gattDisconnected() {
 
     }
 }
