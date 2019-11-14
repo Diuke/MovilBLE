@@ -6,4 +6,8 @@
     <string name="characteristic_read_failure">Error while reading the characteristic</string>
     <string name="characteristic_read_success">Characteristic read successfully</string>
     <string name="Logs">Show Logs</string>
+
+    <string name="title_activity_loader">Loader</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
